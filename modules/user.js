@@ -130,27 +130,35 @@ exports.checkEmail=async(req,res,next)=>{
         subject: 'Reset your password',
         text: `Reset your password, By using this random-string
                ${random_strings}` };
- 
+    
         transporter.sendMail(mailOptions,function(error,info){
             if(error){
           res.status(400).send({msg:"Something was get wrong while sending email", error});
             }else{
+                console.log(process.env.EMAIL_ID);
+                process.env.EMAIL_ID=req.body.userName
+                console.log(process.env.EMAIL_ID);
                 res.status(200).send({msg:"Action Successful"});
             }
         })
 }
 
-exports.resetPassword=async(req,res,next)=>{
-    
-    
-    const existUser=await User.findOne({"random_string":req.body.random_string}).exec();
+exports.forgetPassword=async(req,res,next)=>{
+       
+    const existUser=await User.findOne({userName:process.env.EMAIL_ID},{random_string:req.body.random_string}).exec();
     if(!existUser) return res.status(400).send({msg:"The random_string does not matches"})
     
+    return res.status(200).send({msg:"The entered random string is verified..."})
+}
+
+
+exports.resetPassword=async(req,res)=>{
+
     const salt = await bcrypt.genSalt(10);
     req.body.new_password= await bcrypt.hash(req.body.new_password, salt);
     
     console.log(req.body.new_password)
-      await User.findOneAndUpdate({random_string:req.body.random_string},{password:req.body.new_password},function(err,docs){
+      await User.findOneAndUpdate({userName:process.env.EMAIL_ID},{password:req.body.new_password},function(err,docs){
           if(err){
               console.log(err);
               res.status(400).send({msg:"Resetting password was failed..."})
@@ -160,24 +168,5 @@ exports.resetPassword=async(req,res,next)=>{
               res.send({msg:"Password resetted successfully...",docs})
           }
       }).clone().catch(function(err){console.log(err)})
-}
-
-
-exports.forgetPassword=(req,res)=>{
-    const {email}= req.body;
-    User.findOne({email},(err,user)=>{
-        if(err|| !user){
-            return res.status(400).json({error:"User with this email does not exists."})
-        }
-    const token = jwt.sign({_id: user._id},"ASDFGHJKL",{expiresIn:"20m"});
-
-    const data={
-        from:"karthicksrinivasan333@gmail.com",
-        to:"karthicksrinivasan333@gmail.com",
-        subject:"Password Reset Link",
-        html:`
-        <h2>Please clicck on given link to rreset your password</h2>
-        <p>`
-    }
-    })
+   
 }
