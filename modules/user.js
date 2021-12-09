@@ -170,3 +170,16 @@ exports.resetPassword=async(req,res)=>{
       }).clone().catch(function(err){console.log(err)})
    
 }
+
+exports.clearRandomstring=(req,res,next)=>{
+    await User.findOneAndUpdate({userName:process.env.EMAIL_ID},{random_string:""},function(err,docs){
+        if(err){
+            console.log(err);
+            res.send(400).send({msg:"Random string was not cleared in Database", err})
+        }else{
+            console.log("original doc:", docs);
+            res.send({msg:"Random string was cleared successfully...", docs})
+        }
+    }).clone().catch(function(err){console.log(err)})
+  
+}
