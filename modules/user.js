@@ -96,8 +96,18 @@ const clear=async()=>{
     await User.updateOne({userName:process.env.EMAIL_ID},{$unset:{random_string:1}})
 }
 exports.expire_string=async(req,res,next)=>{
-    clear();
-    
+    await User.updateOne({userName:req.body.userName},{$unset:{random_string:1}},function(err,docs){
+        if(err){
+            console.log(err);
+            res.status(400).send({msg:"expiring was failed..."})
+
+        }else{
+            clear();
+            console.log("Original Doc:", docs)
+            res.send({msg:"random string expired resetted successfully...",docs});
+        
+        }
+    })
 }
 
 exports.getUser=async(req,res,next)=>{
