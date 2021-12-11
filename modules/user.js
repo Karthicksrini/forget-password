@@ -96,6 +96,9 @@ const clear=async()=>{
     await User.updateOne({userName:process.env.EMAIL_ID},{$unset:{random_string:1}})
 
 }
+exports.expire_string=()=>{
+    clear();
+}
 
 exports.getUser=async(req,res,next)=>{
     var response=await User.find();
