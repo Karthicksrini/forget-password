@@ -24,7 +24,7 @@ exports.signup= async (req,res,next)=>{
     if(error) return res.status(400).send({msg:error.details[0].message});
 
 //Email already exists
-var existUser = await User.findOne({"email":req.body.userName}).exec();
+var existUser = await User.findOne({userName:req.body.userName}).exec();
 if(existUser) return res.status(400).send({msg:"Email already exists"});
 
 //Create / user
@@ -150,7 +150,7 @@ exports.checkEmail=async(req,res,next)=>{
 
 exports.forgetPassword=async(req,res,next)=>{
        
-    const existUser=await User.findOne({userName:process.env.EMAIL_ID},{random_string:req.body.random_string}).exec();
+    const existUser=await User.findOne({random_string:req.body.random_string}).exec();
     if(!existUser) return res.status(400).send({msg:"The random_string does not matches"})
     
     return res.status(200).send({msg:"The entered random string is verified..."})
