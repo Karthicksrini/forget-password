@@ -95,7 +95,7 @@ function makeid(length) {
 const clear=async()=>{
     await User.updateOne({userName:process.env.EMAIL_ID},{$unset:{random_string:1}})
 }
-exports.expire_string=(req,res,next)=>{
+exports.expire_string=async(req,res,next)=>{
     await User.updateOne({userName:req.body.userName},{$unset:{random_string:1}})
     
 }
